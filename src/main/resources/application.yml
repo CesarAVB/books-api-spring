@@ -1,6 +1,6 @@
 spring:
   application:
-    name: livro  # Nome da aplicação
+    name: livros-api-backend  # Nome da aplicação
 
   profiles:
     active: dev  # Profile ativo por padrão (desenvolvimento)
