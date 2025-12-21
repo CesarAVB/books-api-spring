@@ -43,8 +43,9 @@ jobs:
       
       # 4. Executa os testes com cobertura
       - name: Run tests with coverage
-        run: chmod +x mvnw
-         ./mvnw clean test jacoco:report
+        run: |
+            chmod +x mvnw
+            ./mvnw clean test jacoco:report
       
       # 5. Gera relatório de cobertura
       - name: Generate JaCoCo Badge
