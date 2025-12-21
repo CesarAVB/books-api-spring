@@ -1,5 +1,19 @@
 # Livros API Backend
 
+![Java](https://img.shields.io/badge/Java-21-orange)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.9-brightgreen)
+![Build Status](https://github.com/SEU-USUARIO/livros-api-backend/workflows/CI%20Pipeline/badge.svg)
+![Coverage](.github/badges/jacoco.svg)
+![Branches](.github/badges/branches.svg)
+![Tests](https://img.shields.io/badge/tests-45%20passing-success)
+
+<!-- César -->
+
+## 📋 Propósito
+API REST para gerenciamento de livros, desenvolvida para estudo de testes unitários, testes de integração e CI/CD com GitHub Actions.
+
+# Livros API Backend
+
 ## 📋 Propósito
 API REST para gerenciamento de livros, desenvolvida para estudo de testes unitários, testes de integração e CI/CD com GitHub Actions.
 

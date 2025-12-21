@@ -1,42 +1,195 @@
+# =============================================================================
+# CONFIGURAÇÃO GERAL DA APLICAÇÃO
+# Esta seção é aplicada em TODOS os profiles (dev, test, prod)
+# =============================================================================
 spring:
   application:
-    name: livros-api-backend  # Nome da aplicação
+    name: livros-api-backend  # Nome da aplicação (identificação)
 
   profiles:
-    active: dev  # Profile ativo por padrão (desenvolvimento)
+    active: prod  # Profile ativo por padrão quando você roda a aplicação
+                 # Se não especificar nada, usa "dev"
 
+# =============================================================================
+# PROFILE: DEV (DESENVOLVIMENTO LOCAL)
+# Usado quando você está desenvolvendo no Eclipse/IntelliJ
+# Banco de dados: H2 (em memória, rápido, sem instalação)
+# =============================================================================
 ---
 spring:
   config:
     activate:
-      on-profile: dev  # Configurações específicas para o profile dev
+      on-profile: dev  # Esta seção só é ativada quando profile = dev
 
   datasource:
-    url: jdbc:h2:mem:testdb  # URL do banco H2 em memória
-    driver-class-name: org.h2.Driver  # Driver JDBC do H2
-    username: sa  # Usuário padrão do H2
-    password:  # Senha vazia
+    # URL do banco H2 em memória
+    # "mem:testdb" = banco em memória chamado "testdb"
+    # Os dados são perdidos quando você para a aplicação
+    url: jdbc:h2:mem:testdb
+    
+    # Driver JDBC do H2
+    driver-class-name: org.h2.Driver
+    
+    # Credenciais padrão do H2 (sem senha)
+    username: sa
+    password:
 
   h2:
     console:
-      enabled: true  # Ativa o console web do H2
-      path: /h2-console  # Caminho para acessar o console (http://localhost:8080/h2-console)
+      # Ativa o console web do H2
+      # Você pode acessar em: http://localhost:8080/h2-console
+      enabled: true
+      
+      # Caminho da URL para acessar o console
+      path: /h2-console
 
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect  # Dialeto do Hibernate para H2
+    # Dialeto do Hibernate para H2
+    # Informa ao Hibernate que está usando H2, então ele gera SQL específico
+    database-platform: org.hibernate.dialect.H2Dialect
+    
     hibernate:
-      ddl-auto: update  # Atualiza o schema automaticamente baseado nas entidades
-    show-sql: true  # Exibe os SQLs executados no console
+      # ddl-auto = Data Definition Language (CREATE TABLE, ALTER TABLE, etc)
+      # "update" = Cria tabelas se não existirem, atualiza se mudaram
+      # CUIDADO: Nunca use "update" em produção!
+      ddl-auto: update
+    
+    # Mostra os comandos SQL no console (útil para debug)
+    show-sql: true
+    
     properties:
       hibernate:
-        format_sql: true  # Formata os SQLs para melhor legibilidade
+        # Formata o SQL de forma legível (com quebras de linha e indentação)
+        format_sql: true
 
-# Configurações do Spring Boot Actuator
+# Configurações do Spring Boot Actuator (monitoramento)
 management:
   endpoints:
     web:
       exposure:
-        include: health,info  # Expõe apenas os endpoints health e info
+        # Quais endpoints do Actuator estão disponíveis
+        # health = /actuator/health (status da aplicação)
+        # info = /actuator/info (informações da aplicação)
+        include: health,info
+  
   endpoint:
     health:
-      show-details: always  # Sempre mostra detalhes do health check (inclui status do banco)
+      # Mostra detalhes completos do health check
+      # Inclui status do banco de dados, disco, etc
+      show-details: always
+
+# =============================================================================
+# PROFILE: TEST (TESTES AUTOMATIZADOS)
+# Usado quando você roda: mvn test ou Run As → JUnit Test
+# Banco de dados: PostgreSQL em container Docker (via Testcontainers)
+# Simula um ambiente mais próximo da produção
+# =============================================================================
+---
+spring:
+  config:
+    activate:
+      on-profile: test  # Esta seção só é ativada quando profile = test
+
+  datasource:
+    # URL especial do Testcontainers
+    # "tc:postgresql:16" = Testcontainers vai subir um PostgreSQL versão 16
+    # "testdb" = nome do banco de dados
+    # Testcontainers gerencia o container automaticamente (sobe e derruba)
+    url: jdbc:tc:postgresql:16:///testdb
+    
+    # Driver especial do Testcontainers
+    # Ele intercepta a conexão e gerencia o container Docker
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    
+    # Credenciais usadas no container de teste
+    username: test
+    password: test
+
+  jpa:
+    # Dialeto do Hibernate para PostgreSQL
+    # SQL gerado será específico para PostgreSQL
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    
+    hibernate:
+      # "create-drop" = Cria as tabelas no início do teste
+      #                 Deleta tudo no final do teste
+      # Garante que cada execução de teste começa com banco limpo
+      ddl-auto: create-drop
+    
+    # Mostra SQL nos testes (ajuda a debugar problemas)
+    show-sql: true
+    
+    properties:
+      hibernate:
+        # Formata o SQL nos logs
+        format_sql: true
+
+# =============================================================================
+# PROFILE: PROD (PRODUÇÃO)
+# Usado quando você faz deploy em servidor real (Heroku, Railway, AWS, etc)
+# Banco de dados: PostgreSQL real instalado no servidor
+# Configurações focadas em SEGURANÇA e PERFORMANCE
+# =============================================================================
+---
+spring:
+  config:
+    activate:
+      on-profile: prod  # Esta seção só é ativada quando profile = prod
+
+  datasource:
+    # URL do banco vem de VARIÁVEL DE AMBIENTE
+    # ${DATABASE_URL} = Lê a variável de ambiente DATABASE_URL
+    # Exemplo: export DATABASE_URL=jdbc:postgresql://servidor.com:5432/meu_banco
+    # NUNCA coloque URL de produção direto no código!
+    url: ${DATABASE_URL}
+    
+    # Driver do PostgreSQL
+    driver-class-name: org.postgresql.Driver
+    
+    # Usuário vem de VARIÁVEL DE AMBIENTE
+    # ${DB_USERNAME} = Lê a variável de ambiente DB_USERNAME
+    # NUNCA coloque usuário/senha direto no código!
+    username: ${DB_USERNAME}
+    
+    # Senha vem de VARIÁVEL DE AMBIENTE
+    # ${DB_PASSWORD} = Lê a variável de ambiente DB_PASSWORD
+    # SEGURANÇA: Senhas nunca devem estar no Git/código
+    password: ${DB_PASSWORD}
+
+  jpa:
+    # Dialeto PostgreSQL para produção
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    
+    hibernate:
+      # "validate" = Apenas VALIDA se as tabelas existem
+      #             NÃO cria, NÃO altera, NÃO deleta nada
+      # Em produção, mudanças no banco devem ser feitas via migrations (Flyway/Liquibase)
+      # NUNCA use "update" ou "create" em produção!
+      ddl-auto: update
+    
+    # NÃO mostra SQL em produção
+    # Motivo: Performance (logs enormes) e Segurança (não expor queries)
+    show-sql: false
+    
+    properties:
+      hibernate:
+        # Não formata SQL em produção (economiza processamento)
+        format_sql: false
+
+# Configurações do Actuator em produção
+management:
+  endpoints:
+    web:
+      exposure:
+        # Em produção, expõe APENAS o health
+        # Não expõe "info" nem outros endpoints por segurança
+        # Você não quer expor informações internas da aplicação
+        include: health
+  
+  endpoint:
+    health:
+      # Em produção, pode querer ocultar detalhes por segurança
+      # Opções: never, when-authorized, always
+      # "always" = mostra detalhes (use se sua aplicação é interna)
+      # "never" = só mostra UP/DOWN (use se aplicação é pública)
+      show-details: always
