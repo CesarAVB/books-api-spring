@@ -1,18 +1,22 @@
 package br.com.sistema.livros.dto;
 
+import java.time.LocalDate;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDate;
+import jakarta.validation.constraints.Size;
 
 public class BookRequestDTO {
 
     @NotBlank(message = "Título é obrigatório")
+    @Size(min = 3, max = 100, message = "Título deve ter entre 3 e 100 caracteres")
     private String titulo;
 
     @NotBlank(message = "Autor é obrigatório")
+    @Size(min = 3, max = 100, message = "Autor deve ter entre 3 e 100 caracteres")
     private String autor;
 
     @NotBlank(message = "ISBN é obrigatório")
+    @Size(min = 10, max = 17, message = "ISBN deve ter entre 10 e 17 caracteres")
     private String isbn;
 
     @NotNull(message = "Data de publicação é obrigatória")
