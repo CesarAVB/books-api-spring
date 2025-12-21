@@ -9,14 +9,6 @@
 
 <!-- César -->
 
-## 📋 Propósito
-API REST para gerenciamento de livros, desenvolvida para estudo de testes unitários, testes de integração e CI/CD com GitHub Actions.
-
-# Livros API Backend
-
-## 📋 Propósito
-API REST para gerenciamento de livros, desenvolvida para estudo de testes unitários, testes de integração e CI/CD com GitHub Actions.
-
 ## 🚀 Tech Stack
 - Java 21
 - Spring Boot 3.5.9
