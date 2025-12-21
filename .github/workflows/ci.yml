@@ -1,88 +1,84 @@
-# Nome do workflow que aparece no GitHub Actions
+# ================================
+# Nome do workflow
+# ================================
+# Esse nome aparece na aba "Actions" do GitHub
 name: CI Pipeline
 
-# Quando executar: a cada push ou pull request
-on:
-  push:
-    branches: [ main, develop ]  # Roda quando fizer push nessas branches
-  pull_request:
-    branches: [ main ]  # Roda quando abrir PR para main
 
-# Jobs = conjunto de tarefas que serão executadas
+# ================================
+# Eventos que disparam o workflow
+# ================================
+on:
+  # Executa quando alguém fizer push
+  push:
+    # Apenas nessas branches
+    branches: [ main, develop ]
+
+  # Executa quando um Pull Request for aberto ou atualizado
+  pull_request:
+    # Apenas PRs que tenham como destino a branch main
+    branches: [ main ]
+
+
+# ================================
+# Jobs = grupos de tarefas
+# ================================
 jobs:
-  # Job principal: executar testes
+
+  # Nome interno do job (pode ser qualquer nome)
   test:
-    # Sistema operacional: Ubuntu (tem Docker disponível)
+
+    # Sistema operacional do runner
+    # ubuntu-latest é o mais comum e gratuito
     runs-on: ubuntu-latest
-    
-    # Nome que aparece no GitHub Actions
+
+    # Nome amigável que aparece no GitHub Actions
     name: Build and Test
-    
-    # Passos do job
+
+
+    # ================================
+    # Steps = passos executados em ordem
+    # ================================
     steps:
-      # 1. Faz checkout do código do repositório
+
+      # ----------------------------
+      # Step 1: Checkout do código
+      # ----------------------------
+      # Baixa o código do repositório para o runner
+      # Sem isso, o runner não tem acesso ao projeto
       - name: Checkout code
         uses: actions/checkout@v4
-      
-      # 2. Configura Java 21
+
+
+      # ----------------------------
+      # Step 2: Configura o Java
+      # ----------------------------
+      # Instala o JDK no runner
+      # Aqui você escolhe a versão do Java do projeto
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
+          # Versão do Java
           java-version: '21'
-          distribution: 'temurin'  # Eclipse Temurin (OpenJDK)
-          cache: 'maven'  # Cache das dependências Maven
-      
-      # 3. Cache do Maven (acelera builds)
-      - name: Cache Maven packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-      
-      # 4. Executa os testes com cobertura
-      - name: Run tests with coverage
+
+          # Distribuição OpenJDK (Temurin é padrão de mercado)
+          distribution: 'temurin'
+
+          # Ativa cache automático do Maven
+          # Evita baixar dependências toda vez
+          cache: 'maven'
+
+
+      # ----------------------------
+      # Step 3: Executa build e testes
+      # ----------------------------
+      - name: Run tests
         run: |
-            chmod +x mvnw
-            ./mvnw clean test jacoco:report
-      
-      # 5. Gera relatório de cobertura
-      - name: Generate JaCoCo Badge
-        id: jacoco
-        uses: cicirello/jacoco-badge-generator@v2
-        with:
-          jacoco-csv-file: target/site/jacoco/jacoco.csv
-          badges-directory: .github/badges
-          generate-branches-badge: true
-          generate-summary: true
-      
-      # 6. Commit dos badges (se houver mudança)
-      - name: Commit and push badges
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          if [[ `git status --porcelain .github/badges` ]]; then
-            git config --global user.name 'github-actions[bot]'
-            git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-            git add .github/badges
-            git commit -m "docs: update coverage badges [skip ci]"
-            git push
-          fi
-      
-      # 7. Upload do relatório de cobertura como artifact
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v4
-        with:
-          name: jacoco-report
-          path: target/site/jacoco/
-          retention-days: 30
-      
-      # 8. Adiciona comentário no PR com cobertura
-      - name: Add coverage to PR
-        if: github.event_name == 'pull_request'
-        uses: madrapps/jacoco-report@v1.6.1
-        with:
-          paths: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: 80
-          min-coverage-changed-files: 80
+          # Dá permissão de execução ao mvnw
+          # Necessário porque o runner Linux respeita permissões
+          chmod +x mvnw
+
+          # Executa o Maven Wrapper
+          # clean -> limpa builds anteriores
+          # test  -> compila e roda os testes
+          ./mvnw clean test
