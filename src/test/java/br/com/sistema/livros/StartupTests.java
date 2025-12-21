@@ -1,13 +1,10 @@
 package br.com.sistema.livros;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@SpringBootConfiguration
-@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = Startup.class) // ou simplesmente @SpringBootTest
 @ActiveProfiles("dev")
 class StartupTests {
 
