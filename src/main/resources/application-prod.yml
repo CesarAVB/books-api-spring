@@ -1,3 +1,7 @@
+# Garante que localmente rode na 8080 (opcional, mas boa prática)
+server:
+  port: 8080
+
 # Configurações para Banco PostgreSQL (Produção)
 spring:
   datasource:
