@@ -2,7 +2,6 @@
 
 ![Java](https://img.shields.io/badge/Java-21-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.9-brightgreen)
-![Build Status](https://github.com/CesarAVB/books-api-spring/workflows/CI%20Pipeline/badge.svg)
 ![Branches](.github/badges/branches.svg)
 ![Tests](https://img.shields.io/badge/tests-45%20passing-success)
 

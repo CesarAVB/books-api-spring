@@ -1,0 +1,19 @@
+# Configurações para Banco PostgreSQL (Produção)
+spring:
+  datasource:
+    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=disable&reWriteBatchedInserts=true
+    username: ${PGUSERNAME}
+    password: ${PGPASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate # Recomendado 'validate' para produção
+    show-sql: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

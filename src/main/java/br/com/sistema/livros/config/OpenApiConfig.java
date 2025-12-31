@@ -22,7 +22,7 @@ public class OpenApiConfig {
                         .contact(new Contact()
                                 .name("César Augusto")
                                 .email("cesar.augusto.rj1@gmail.com")
-                                .url("https://quemsoueu-six.vercel.app/"))
+                                .url("https://portfolio.cesaravb.com.br/"))
                         .license(new License()
                                 .name("MIT License")
                                 .url("https://opensource.org/licenses/MIT")));

@@ -23,13 +23,12 @@ public class BookService {
         this.mapper = mapper;
     }
 
-    /**
-     * Cria um novo livro
-     * Valida se o ISBN já existe antes de salvar
-     */
+
+    // Cria um novo livro - Valida se o ISBN já existe antes de salvar
     @Transactional
     public BookResponseDTO criarLivro(BookRequestDTO dto) {
-        // Validação: ISBN deve ser único
+        
+    	// Validação: ISBN deve ser único
         if (repository.existsByIsbn(dto.getIsbn())) {
             throw new IllegalArgumentException("ISBN já cadastrado: " + dto.getIsbn());
         }
@@ -44,14 +43,13 @@ public class BookService {
         return mapper.toResponse(savedBook);
     }
 
-    /**
-     * Atualiza um livro existente
-     */
+    
+    // Atualiza um livro existente
     @Transactional
     public BookResponseDTO atualizarLivro(Long id, BookRequestDTO dto) {
-        // Busca o livro ou lança exceção se não existir
-        Book book = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Livro não encontrado com ID: " + id));
+       
+    	// Busca o livro ou lança exceção se não existir
+        Book book = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Livro não encontrado com ID: " + id));
 
         // Validação: se o ISBN mudou, verifica se já existe outro livro com esse ISBN
         if (!book.getIsbn().equals(dto.getIsbn()) && repository.existsByIsbn(dto.getIsbn())) {
@@ -70,36 +68,28 @@ public class BookService {
         return mapper.toResponse(updatedBook);
     }
 
-    /**
-     * Busca um livro por ID
-     */
+    
+    // Busca um livro por ID
     public BookResponseDTO getById(Long id) {
-        Book book = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Livro não encontrado com ID: " + id));
-        
+        Book book = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Livro não encontrado com ID: " + id));
         return mapper.toResponse(book);
     }
 
-    /**
-     * Lista todos os livros
-     */
+    
+    // Lista todos os livros
     public List<BookResponseDTO> listarTodos() {
-        return repository.findAll()
-                .stream()
-                .map(mapper::toResponse)
-                .collect(Collectors.toList());
+        return repository.findAll().stream().map(mapper::toResponse).collect(Collectors.toList());
     }
 
-    /**
-     * Deleta um livro por ID
-     */
+    
+    // Deleta um livro por ID
     @Transactional
     public void deletar(Long id) {
-        // Verifica se existe antes de deletar
+        
+    	// Verifica se existe antes de deletar
         if (!repository.existsById(id)) {
             throw new EntityNotFoundException("Livro não encontrado com ID: " + id);
-        }
-        
+        }       
         repository.deleteById(id);
     }
 }
