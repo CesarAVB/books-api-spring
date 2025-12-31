@@ -7,9 +7,9 @@ spring:
     driver-class-name: org.postgresql.Driver
 
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    #database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: validate # Recomendado 'validate' para produção
+      ddl-auto: update # Recomendado 'validate' para produção
     show-sql: false
 
 management:
